@@ -1,21 +1,26 @@
 import { useState } from 'react'
 import axios from 'axios'
 import './App.css'
+import MapView from './mapview/MapView.jsx'
 
 function App() {
 
   const [form, setForm] = useState({
-    comercioFitosanitario: "",
+    fechaAplicacion: "",
+    asesor: "",
+    empresaProductora: "",
     cuit1: "",
-    adquiriente: "",
+    aplicadora: "",
     cuit2: "",
     domicilio: "",
     predio: "",
+    gps: "",
     superficie: "",
+    poligono: [],
     cultivo: "",
     diagnostico: "",
-    tratamiento: "",
     recomendacion: "",
+    //email: "",
     agroquimicos: [
       {
         principioActivo: "",
@@ -26,6 +31,16 @@ function App() {
     ]
   });
 
+
+  // Manejar cambios en el polígono
+  const handlePolygonComplete = (coords) => {
+    setForm(prevForm => ({
+      ...prevForm,
+      poligono: coords
+    }));
+  };
+
+  // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -33,10 +48,18 @@ function App() {
     });
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!form.fechaAplicacion || form.poligono.length === 0) {
+      alert("Por favor, dibuje el polígono del predio tratado en el mapa.");
+      return;
+    }
+
     try {
+      console.log("Enviando formulario:", form);
+
       const res = await axios.post("http://localhost:3000/generar-pdf", form);
 
       alert("PDF generado correctamente");
@@ -44,17 +67,21 @@ function App() {
 
       // reiniciar el formulario
       setForm({
-        comercioFitosanitario: "",
+        fechaAplicacion: "",
+        asesor: "",
+        empresaProductora: "",
         cuit1: "",
-        adquiriente: "",
+        aplicadora: "",
         cuit2: "",
         domicilio: "",
         predio: "",
+        gps: "",
         superficie: "",
+        poligono: [],
         cultivo: "",
         diagnostico: "",
-        tratamiento: "",
         recomendacion: "",
+        //email: "",
         agroquimicos: [
           {
             principioActivo: "",
@@ -118,62 +145,82 @@ function App() {
 
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
-
             <div className="form-group">
-              <label>Comercio Fitosanitario:</label>
-              <input name="comercioFitosanitario" onChange={handleChange} required />
+              <label>Fecha de Aplicación:</label>
+              <input name="fechaAplicacion" value={form.fechaAplicacion} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
-              <label>CUIT Comercio:</label>
-              <input name="cuit1" onChange={handleChange} required />
+              <label>Asesor:</label>
+              <input name="asesor" value={form.asesor} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
-              <label>Adquiriente:</label>
-              <input name="adquiriente" onChange={handleChange} required />
+              <label>Empresa Productora:</label>
+              <input name="empresaProductora" value={form.empresaProductora} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
-              <label>CUIT Adquiriente:</label>
-              <input name="cuit2" onChange={handleChange} required />
+              <label>CUIT Empresa Productora:</label>
+              <input name="cuit1" value={form.cuit1} onChange={handleChange} required />
+            </div>
+
+            <div className="form-group">
+              <label>Aplicadora:</label>
+              <input name="aplicadora" value={form.aplicadora} onChange={handleChange} required />
+            </div>
+
+            <div className="form-group">
+              <label>CUIT Aplicadora:</label>
+              <input name="cuit2" value={form.cuit2} onChange={handleChange} required />
             </div>
 
             <div className="form-group full">
               <label>Domicilio:</label>
-              <input name="domicilio" onChange={handleChange} required />
+              <input name="domicilio" value={form.domicilio} onChange={handleChange} required />
             </div>
 
             <div className="form-group full">
               <label>Localización del Predio Tratado:</label>
-              <input name="predio" onChange={handleChange} required />
+              <input name="predio" value={form.predio} onChange={handleChange} required />
+            </div>
+
+            <div className="form-group">
+              <label>Punto GPS:</label>
+              <input name="gps" value={form.gps} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
               <label>Superficie:</label>
-              <input name="superficie" onChange={handleChange} required />
+              <input name="superficie" value={form.superficie} onChange={handleChange} required />
+            </div>
+
+            <div
+              className='form-group full'
+              style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}
+              onClick={(e) => e.stopPropagation()} // 👈 Esto evita que clics en el mapa lleguen al <form>
+            >
+              <h4>Polígono del Predio Tratado</h4>
+              <div className="form-group full">
+                <MapView onPolygonComplete={handlePolygonComplete} />
+              </div>
             </div>
 
             <div className="form-group">
               <label>Cultivo a Tratar:</label>
-              <input name="cultivo" onChange={handleChange} required />
+              <input name="cultivo" value={form.cultivo} onChange={handleChange} required />
             </div>
 
             <div className="form-group full">
               <label>Diagnóstico:</label>
-              <input name="diagnostico" onChange={handleChange} required />
-            </div>
-
-            <div className="form-group full">
-              <label>Tratamiento:</label>
-              <input name="tratamiento" onChange={handleChange} required />
+              <input name="diagnostico" value={form.diagnostico} onChange={handleChange} required />
             </div>
 
             {/* Campo dinámico para agroquímicos */}
             {form.agroquimicos.map((agro, index) => (
               <div key={index} className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
 
-                <h4>Agroquímico {index + 1}</h4>
+                <h4>Tratamiento {index + 1}</h4>
 
                 <div className="form-grid">
 
@@ -241,8 +288,17 @@ function App() {
             {/* Fin campo de agroquímicos */}
             <div className="form-group full">
               <label>Recomendación Técnicas:</label>
-              <textarea name="recomendacion" onChange={handleChange} required />
+              <textarea name="recomendacion" value={form.recomendacion} onChange={handleChange} />
             </div>
+
+            {/*<div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
+              /* mail por el cual se enviara la receta */}
+            {/*<div className="form-group full">
+                <legend>En este mail usted recibira la receta</legend>
+                <label>Correo Electrónico:</label>
+                <input type="email" name="email" value={form.email} onChange={handleChange} required />
+              </div>
+            </div>*/}
 
           </div>
 
