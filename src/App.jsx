@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import axios from 'axios'
 import './App.css'
 import MapView from './mapview/MapView.jsx'
 
 function App() {
+
+  const mapViewRef = useRef(null); // Referencia para el mapa
 
   const [form, setForm] = useState({
     fechaAplicacion: "",
@@ -20,7 +22,7 @@ function App() {
     cultivo: "",
     diagnostico: "",
     recomendacion: "",
-    //email: "",
+    email: "",
     agroquimicos: [
       {
         principioActivo: "",
@@ -58,9 +60,26 @@ function App() {
     }
 
     try {
-      console.log("Enviando formulario:", form);
 
-      const res = await axios.post("http://localhost:3000/generar-pdf", form);
+      // 1. 👈 Pedimos la imagen al mapa (esto es asíncrono)
+      const mapImageBase64 = await mapViewRef.current.getMapImage();
+      
+      // 2. 👈 Creamos el objeto final de datos, incluyendo la imagen
+      const dataToSend = {
+        ...form,
+        mapaImagen: mapImageBase64 // Este es un string larguísimo (Base64)
+      };
+
+      console.log("Enviando formulario:", dataToSend);
+
+      const res = await axios.post("http://localhost:3000/generar-pdf", dataToSend);
+
+      if (res.data.ok) {
+            alert(res.data.mensaje); // "Receta N° X procesada y enviada..."
+            // Aquí podés limpiar el formulario o redirigir al usuario si querés
+        } else {
+            alert("Hubo un problema al procesar la solicitud.");
+        }
 
       alert("PDF generado correctamente");
 
@@ -81,7 +100,7 @@ function App() {
         cultivo: "",
         diagnostico: "",
         recomendacion: "",
-        //email: "",
+        email: "",
         agroquimicos: [
           {
             principioActivo: "",
@@ -202,7 +221,7 @@ function App() {
             >
               <h4>Polígono del Predio Tratado</h4>
               <div className="form-group full">
-                <MapView onPolygonComplete={handlePolygonComplete} />
+                <MapView ref={mapViewRef} onPolygonComplete={handlePolygonComplete} />
               </div>
             </div>
 
@@ -291,14 +310,14 @@ function App() {
               <textarea name="recomendacion" value={form.recomendacion} onChange={handleChange} />
             </div>
 
-            {/*<div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
-              /* mail por el cual se enviara la receta */}
-            {/*<div className="form-group full">
+            <div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
+              {/* mail por el cual se enviara la receta */}
+            <div className="form-group full">
                 <legend>En este mail usted recibira la receta</legend>
                 <label>Correo Electrónico:</label>
                 <input type="email" name="email" value={form.email} onChange={handleChange} required />
               </div>
-            </div>*/}
+            </div>
 
           </div>
 

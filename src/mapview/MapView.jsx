@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react' // 👈 AQUÍ AGREGAMOS useRef Y useImperativeHandle
 import { MapContainer, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import '@geoman-io/leaflet-geoman-free'
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
+import html2canvas from 'html2canvas'
 
 // Este componente activa las herramientas de dibujo
 const GeomanControl = ({ onPolygonComplete }) => {
@@ -18,7 +19,7 @@ const GeomanControl = ({ onPolygonComplete }) => {
       drawCircle: false,
       drawPolyline: false,
       drawRectangle: false,
-      drawPolygon: true, // Solo dejamos el polígono para el campo
+      drawPolygon: true, 
       editMode: true,
       dragMode: true,
       removalMode: true,
@@ -50,27 +51,48 @@ const GeomanControl = ({ onPolygonComplete }) => {
       map.pm.removeControls();
       map.off('pm:create');
     };
-  }, [map]);
+  }, [map, onPolygonComplete]);
 
   return null;
 };
 
-const MapView = ({ onPolygonComplete }) => {
+const MapView = forwardRef(({ onPolygonComplete }, ref) => {
+  const mapContainerRef = useRef(null); // Ahora sí va a funcionar porque está importado arriba
+
+  // Exponemos la función getMapImage al padre
+  useImperativeHandle(ref, () => ({
+    getMapImage: async () => {
+      if (!mapContainerRef.current) return null;
+
+      // Configuraciones para que la captura salga bien
+      const canvas = await html2canvas(mapContainerRef.current, {
+        useCORS: true, 
+        logging: false,
+        height: 400,
+        width: mapContainerRef.current.offsetWidth,
+      });
+
+      // Convertimos el canvas a una imagen Base64 (PNG)
+      return canvas.toDataURL('image/png');
+    }
+  }));
+
   return (
-    <MapContainer
-      center={[-26.8083, -65.2176]}
-      zoom={13}
-      style={{ height: '400px', width: '100%' }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; OpenStreetMap contributors'
-      />
-
-      {/* El componente mágico */}
-      <GeomanControl onPolygonComplete={onPolygonComplete} />
-    </MapContainer>
+    <div ref={mapContainerRef} style={{ height: '400px', width: '100%', position: 'relative' }}>
+      <MapContainer 
+        center={[-26.8083, -65.2176]} 
+        zoom={13} 
+        style={{ height: '100%', width: '100%' }}
+        preferCanvas={true} // Esto mejora el rendimiento al dibujar polígonos complejos
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; OpenStreetMap contributors'
+        />
+        <GeomanControl onPolygonComplete={onPolygonComplete} />
+      </MapContainer>
+    </div>
   )
-}
+});
 
-export default MapView
+export default React.memo(MapView);
