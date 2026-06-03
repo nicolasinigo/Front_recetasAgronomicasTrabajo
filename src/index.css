@@ -94,6 +94,16 @@ h2 {
 p {
   margin: 0;
 }
+select{
+  font-family: var(--sans);
+  font-size: 19px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
+  border: none;
+  border-radius: 4px;
+}
+
 
 code,
 .counter {

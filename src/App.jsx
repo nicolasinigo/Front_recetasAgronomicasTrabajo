@@ -10,10 +10,16 @@ function App() {
   const [form, setForm] = useState({
     fechaAplicacion: "",
     asesor: "",
-    empresaProductora: "",
     cuit1: "",
-    aplicadora: "",
+    empresaProductora: "",
     cuit2: "",
+    aplicadora: "",
+    categoriaAplicadora: "",
+    cuit3: "",
+    piloto: "",
+    cuit4: "",
+    tipoMaquina: "",
+    Matricula: "",
     domicilio: "",
     predio: "",
     gps: "",
@@ -22,7 +28,9 @@ function App() {
     cultivo: "",
     diagnostico: "",
     recomendacion: "",
-    email: "",
+    emailEmpresa: "",
+    emailAsesor: "",
+    emailPiloto: "",
     agroquimicos: [
       {
         principioActivo: "",
@@ -63,7 +71,7 @@ function App() {
 
       // 1. 👈 Pedimos la imagen al mapa (esto es asíncrono)
       const mapImageBase64 = await mapViewRef.current.getMapImage();
-      
+
       // 2. 👈 Creamos el objeto final de datos, incluyendo la imagen
       const dataToSend = {
         ...form,
@@ -75,23 +83,29 @@ function App() {
       const res = await axios.post("http://localhost:3000/generar-pdf", dataToSend);
 
       if (res.data.ok) {
-            alert(res.data.mensaje); // "Receta N° X procesada y enviada..."
-            // Aquí podés limpiar el formulario o redirigir al usuario si querés
-        } else {
-            alert("Hubo un problema al procesar la solicitud.");
-        }
+        alert(res.data.mensaje); // "Receta N° X procesada y enviada..."
+        // Aquí podés limpiar el formulario o redirigir al usuario si querés
+      } else {
+        alert("Hubo un problema al procesar la solicitud.");
+      }
 
       alert("PDF generado correctamente");
 
 
       // reiniciar el formulario
-      setForm({
+      /*setForm({
         fechaAplicacion: "",
         asesor: "",
-        empresaProductora: "",
         cuit1: "",
-        aplicadora: "",
+        empresaProductora: "",
         cuit2: "",
+        aplicadora: "",
+        categoriaAplicadora: "",
+        cuit3: "",
+        piloto: "",
+        cuit4: "",
+        tipoMaquina: "",
+        Matricula: "",
         domicilio: "",
         predio: "",
         gps: "",
@@ -100,7 +114,9 @@ function App() {
         cultivo: "",
         diagnostico: "",
         recomendacion: "",
-        email: "",
+        emailEmpresa: "",
+        emailAsesor: "",
+        emailPiloto: "",
         agroquimicos: [
           {
             principioActivo: "",
@@ -109,7 +125,7 @@ function App() {
             cantidadTotal: ""
           }
         ]
-      });
+      });*/
 
       // 👉 abrir PDF
       window.open(res.data.url, "_blank");
@@ -160,7 +176,7 @@ function App() {
   return (
     <>
       <div className="form-container">
-        <h2>Receta Agroquímica</h2>
+        <h2>Receta Agroquímica de Aplicación</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
@@ -168,30 +184,76 @@ function App() {
               <label>Fecha de Aplicación:</label>
               <input name="fechaAplicacion" value={form.fechaAplicacion} onChange={handleChange} required />
             </div>
+            <br />
 
-            <div className="form-group">
-              <label>Asesor:</label>
-              <input name="asesor" value={form.asesor} onChange={handleChange} required />
-            </div>
+            <div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
 
-            <div className="form-group">
-              <label>Empresa Productora:</label>
-              <input name="empresaProductora" value={form.empresaProductora} onChange={handleChange} required />
-            </div>
+              <h4>Responsables:</h4>
 
-            <div className="form-group">
-              <label>CUIT Empresa Productora:</label>
-              <input name="cuit1" value={form.cuit1} onChange={handleChange} required />
-            </div>
+              <div className="form-grid">
 
-            <div className="form-group">
-              <label>Aplicadora:</label>
-              <input name="aplicadora" value={form.aplicadora} onChange={handleChange} required />
-            </div>
 
-            <div className="form-group">
-              <label>CUIT Aplicadora:</label>
-              <input name="cuit2" value={form.cuit2} onChange={handleChange} required />
+                <div className="form-group">
+                  <label>Asesor:</label>
+                  <input name="asesor" value={form.asesor} onChange={handleChange} required />
+                </div>
+
+                <div className="form-group">
+                  <label>CUIT asesor:</label>
+                  <input name="cuit1" value={form.cuit1} onChange={handleChange} required />
+                </div>
+
+                <div className="form-group">
+                  <label>Empresa Productora:</label>
+                  <input name="empresaProductora" value={form.empresaProductora} onChange={handleChange} required />
+                </div>
+
+                <div className="form-group">
+                  <label>CUIT Empresa Productora:</label>
+                  <input name="cuit2" value={form.cuit2} onChange={handleChange} required />
+                </div>
+
+                <div className="form-group">
+                  <label>Nombre de Empresa Aplicadora:</label>
+                  <input name="aplicadora" value={form.aplicadora} onChange={handleChange} required />
+                </div>
+
+                <div className="form-group">
+                  <label>Categoria de Empresa Aplicadora:</label>
+                  <select name="categoriaAplicadora" value={form.categoriaAplicadora} onChange={handleChange} required>
+                    <option value="">Seleccione una categoría</option>
+                    <option value="AplicadoraAerea">Aplicadora Aerea</option>
+                    <option value="AplicadoraTerrestre">Aplicadora Terrestre</option>
+                    <option value="AplicadoraDron">Aplicacion con Dron</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>CUIT Aplicadora:</label>
+                  <input name="cuit3" value={form.cuit3} onChange={handleChange} required />
+                </div>
+                <br />
+                <div className="form-group">
+                  <label>Nombre del Piloto:</label>
+                  <input name="piloto" value={form.piloto} onChange={handleChange} required />
+                </div>
+
+                <div className="form-group">
+                  <label>CUIT Piloto:</label>
+                  <input name="cuit4" value={form.cuit4} onChange={handleChange} required />
+                </div>
+
+                <div className="form-group">
+                  <label>Tipo de Máquina:</label>
+                  <input name="tipoMaquina" value={form.tipoMaquina} onChange={handleChange} required />
+                </div>
+
+                <div className="form-group">
+                  <label>Matricula de la Máquina:</label>
+                  <input name="Matricula" value={form.Matricula} onChange={handleChange} required />
+                </div>
+
+              </div>
             </div>
 
             <div className="form-group full">
@@ -312,11 +374,24 @@ function App() {
 
             <div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
               {/* mail por el cual se enviara la receta */}
-            <div className="form-group full">
+              <div className="form-group full">
                 <legend>En este mail usted recibira la receta</legend>
-                <label>Correo Electrónico:</label>
-                <input type="email" name="email" value={form.email} onChange={handleChange} required />
+                <label>Correo Electrónico Empresa:</label>
+                <input type="email" name="emailEmpresa" value={form.emailEmpresa} onChange={handleChange} required />
               </div>
+              <br />
+              <div className="form-group full">
+                <legend>En este mail el asesor recibira una copia de la receta</legend>
+                <label>Correo Electrónico del Asesor:</label>
+                <input type="email" name="emailAsesor" value={form.emailAsesor} onChange={handleChange} required />
+              </div>
+              <br />
+              <div className="form-group full">
+                <legend>En este mail el piloto recibira una copia de la receta</legend>
+                <label>Correo Electrónico del Piloto:</label>
+                <input type="email" name="emailPiloto" value={form.emailPiloto} onChange={handleChange} required />
+              </div>
+
             </div>
 
           </div>
