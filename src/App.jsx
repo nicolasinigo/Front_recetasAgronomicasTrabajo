@@ -3,6 +3,7 @@ import axios from 'axios'
 import './App.css'
 import MapView from './mapview/MapView.jsx'
 
+
 function App() {
 
   const mapViewRef = useRef(null); // Referencia para el mapa
@@ -58,12 +59,33 @@ function App() {
     });
   };
 
+  // Validación de fecha: mínimo 24 horas desde ahora, máximo 7 días desde ahora
+  const hoy = new Date();
+
+  const minDate = new Date(hoy);
+  minDate.setDate(minDate.getDate() + 1); // mañana
+
+  const maxDate = new Date(hoy);
+  maxDate.setDate(maxDate.getDate() + 7); // dentro de 7 días
+
+  const minDateStr = minDate.toISOString().split("T")[0];
+  const maxDateStr = maxDate.toISOString().split("T")[0];
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validar que se haya dibujado un polígono y que la fecha sea correcta
     if (!form.fechaAplicacion || form.poligono.length === 0) {
       alert("Por favor, dibuje el polígono del predio tratado en el mapa.");
+      return;
+    }
+
+    // Validar que la fecha esté dentro del rango permitido
+    const fechaAplicacion = new Date(form.fechaAplicacion);
+
+    if (fechaAplicacion < minDate || fechaAplicacion > maxDate) {
+      alert("La fecha debe estar entre mañana y los próximos 7 días.");
       return;
     }
 
@@ -80,7 +102,7 @@ function App() {
 
       console.log("Enviando formulario:", dataToSend);
 
-      const res = await axios.post("http://localhost:3000/generar-pdf", dataToSend);
+      const res = await axios.post(process.env.URL_BACKEND, dataToSend);
 
       if (res.data.ok) {
         alert(res.data.mensaje); // "Receta N° X procesada y enviada..."
@@ -182,7 +204,7 @@ function App() {
           <div className="form-grid">
             <div className="form-group">
               <label>Fecha de Aplicación:</label>
-              <input name="fechaAplicacion" value={form.fechaAplicacion} onChange={handleChange} required />
+              <input type="date" name="fechaAplicacion" value={form.fechaAplicacion} min={minDateStr} max={maxDateStr} onChange={handleChange} required />
             </div>
             <br />
 
