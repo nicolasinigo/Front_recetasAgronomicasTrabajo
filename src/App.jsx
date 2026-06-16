@@ -102,7 +102,10 @@ function App() {
 
       console.log("Enviando formulario:", dataToSend);
 
-      const res = await axios.post(process.env.URL_BACKEND, dataToSend);
+      const res = await axios.post(
+        import.meta.env.VITE_URL_BACKEND,
+        dataToSend
+      );
 
       if (res.data.ok) {
         alert(res.data.mensaje); // "Receta N° X procesada y enviada..."
@@ -115,7 +118,7 @@ function App() {
 
 
       // reiniciar el formulario
-      /*setForm({
+      setForm({
         fechaAplicacion: "",
         asesor: "",
         cuit1: "",
@@ -147,7 +150,11 @@ function App() {
             cantidadTotal: ""
           }
         ]
-      });*/
+      });
+      
+
+      //funcion para refrescar el mapa
+      refreshMap();
 
       // 👉 abrir PDF
       window.open(res.data.url, "_blank");
@@ -193,6 +200,13 @@ function App() {
       ...form,
       agroquimicos: nuevos
     });
+  };
+
+  // Función para refrescar el mapa
+  const refreshMap = () => {
+    if (mapViewRef.current) {
+      mapViewRef.current.getMapImage(); // Esto forzará a MapView a refrescar su estado interno y, por ende, el mapa
+    }
   };
 
   return (
