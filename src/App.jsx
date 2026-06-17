@@ -108,13 +108,10 @@ function App() {
       );
 
       if (res.data.ok) {
-        alert(res.data.mensaje); // "Receta N° X procesada y enviada..."
-        // Aquí podés limpiar el formulario o redirigir al usuario si querés
+        abrirModalExito(res.data.mensaje || "Datos enviados correctamente.");
       } else {
         alert("Hubo un problema al procesar la solicitud.");
       }
-
-      alert("PDF generado correctamente");
 
 
       // reiniciar el formulario
@@ -151,13 +148,9 @@ function App() {
           }
         ]
       });
-      
 
       //funcion para refrescar el mapa
       refreshMap();
-
-      // 👉 abrir PDF
-      window.open(res.data.url, "_blank");
 
     } catch (error) {
       console.error(error);
@@ -208,6 +201,20 @@ function App() {
       mapViewRef.current.getMapImage(); // Esto forzará a MapView a refrescar su estado interno y, por ende, el mapa
     }
   };
+
+  //modal
+  const abrirModalExito = (mensaje) => {
+    const modal = document.getElementById("modalExito");
+    const mensajeModal = document.getElementById("mensajeModal");
+    mensajeModal.textContent = mensaje;
+    modal.style.display = "flex";
+  };
+  
+  const cerrarModalExito = () => {
+    const modal = document.getElementById("modalExito");
+    modal.style.display = "none";
+  };
+
 
   return (
     <>
@@ -434,6 +441,16 @@ function App() {
 
           <button type="submit">Generar Receta</button>
         </form>
+
+        {/*Modal de respuesta */}
+
+        <div id="modalExito" className="modal">
+          <div className="modal-contenido">
+            <h2>La operación realizada con exito</h2>
+            <p id="mensajeModal">La operación se realizó correctamente.</p>
+            <button id="cerrarModal" onClick={cerrarModalExito}>Aceptar</button>
+          </div>
+        </div>
       </div>
     </>
   )
