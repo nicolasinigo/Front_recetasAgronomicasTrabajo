@@ -8,6 +8,8 @@ function App() {
 
   const mapViewRef = useRef(null); // Referencia para el mapa
 
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     fechaAplicacion: "",
     asesor: "",
@@ -51,9 +53,26 @@ function App() {
     }));
   };
 
-  // Manejar cambios en los campos del formulario
+  // Manejar cambios en los campos del formulario y borrar piloto y cuit4 si la categoria es terrestre
   const handleChange = (e) => {
+
+    if (e.target.name === "categoriaAplicadora" && e.target.value === "AplicadoraTerrestre") {
+      setForm({
+        ...form,
+        [e.target.name]: e.target.value,
+        piloto: "",
+        cuit4: "",
+        emailPiloto: "" // Limpiamos el email del piloto también
+      });
+      return;
+    }
+
     setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    });
+
+    console.log("Formulario actualizado:", {
       ...form,
       [e.target.name]: e.target.value
     });
@@ -77,27 +96,52 @@ function App() {
 
     // Validar que se haya dibujado un polígono y que la fecha sea correcta
     if (!form.fechaAplicacion || form.poligono.length === 0) {
-      alert("Por favor, dibuje el polígono del predio tratado en el mapa.");
+      abrirModalExito("Por favor, dibuje el polígono del predio tratado en el mapa.");
       return;
     }
 
     // Validar que la fecha esté dentro del rango permitido
-    const fechaAplicacion = new Date(form.fechaAplicacion);
+    const fechaAplicacion = form.fechaAplicacion;
 
-    if (fechaAplicacion < minDate || fechaAplicacion > maxDate) {
-      alert("La fecha debe estar entre mañana y los próximos 7 días.");
+    if (fechaAplicacion < minDateStr || fechaAplicacion > maxDateStr) {
+      abrirModalExito(
+        `La fecha de aplicación debe estar entre ${minDateStr} y ${maxDateStr}.`
+      );
+      return;
+    }
+
+    // Validar que los correos electrónicos sean válidos
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(form.emailEmpresa)) {
+      abrirModalExito("Por favor, ingrese un correo electrónico válido para la empresa.");
+      return;
+    }
+
+    if (!emailRegex.test(form.emailAsesor)) {
+      abrirModalExito("Por favor, ingrese un correo electrónico válido para el asesor.");
+      return;
+    }
+
+    if (form.categoriaAplicadora !== "AplicadoraTerrestre" && !emailRegex.test(form.emailPiloto)) {
+      abrirModalExito("Por favor, ingrese un correo electrónico válido para el piloto.");
       return;
     }
 
     try {
 
+      setLoading(true); // INICIA CARGA
+
       // 1. 👈 Pedimos la imagen al mapa (esto es asíncrono)
       const mapImageBase64 = await mapViewRef.current.getMapImage();
 
-      // 2. 👈 Creamos el objeto final de datos, incluyendo la imagen
+      // 2. 👈 Creamos el objeto final de datos, incluyendo la imagen, y los datos del piloto
       const dataToSend = {
         ...form,
-        mapaImagen: mapImageBase64 // Este es un string larguísimo (Base64)
+        mapaImagen: mapImageBase64, // Este es un string larguísimo (Base64)
+        piloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.piloto,
+        cuit4: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.cuit4,
+        emailPiloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "" : form.emailPiloto
       };
 
       console.log("Enviando formulario:", dataToSend);
@@ -110,7 +154,7 @@ function App() {
       if (res.data.ok) {
         abrirModalExito(res.data.mensaje || "Datos enviados correctamente.");
       } else {
-        alert("Hubo un problema al procesar la solicitud.");
+        abrirModalExito("Hubo un problema al procesar la solicitud.");
       }
 
 
@@ -154,7 +198,10 @@ function App() {
 
     } catch (error) {
       console.error(error);
-      alert("Error al generar el PDF");
+      abrirModalExito("Error al generar el PDF");
+    }
+    finally {
+      setLoading(false); // TERMINA CARGA
     }
   };
 
@@ -209,7 +256,7 @@ function App() {
     mensajeModal.textContent = mensaje;
     modal.style.display = "flex";
   };
-  
+
   const cerrarModalExito = () => {
     const modal = document.getElementById("modalExito");
     modal.style.display = "none";
@@ -224,7 +271,7 @@ function App() {
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="form-group">
-              <label>Fecha de Aplicación:</label>
+              <label>Fecha de la Aplicación:</label>
               <input type="date" name="fechaAplicacion" value={form.fechaAplicacion} min={minDateStr} max={maxDateStr} onChange={handleChange} required />
             </div>
             <br />
@@ -242,7 +289,7 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT asesor:</label>
+                  <label>CUIT asesor:(xx-xxxxxxxx-x)</label>
                   <input name="cuit1" value={form.cuit1} onChange={handleChange} required />
                 </div>
 
@@ -252,7 +299,7 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT Empresa Productora:</label>
+                  <label>CUIT Empresa Productora:(xx-xxxxxxxx-x)</label>
                   <input name="cuit2" value={form.cuit2} onChange={handleChange} required />
                 </div>
 
@@ -272,19 +319,34 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT Aplicadora:</label>
+                  <label>CUIT Aplicadora:(xx-xxxxxxxx-x)</label>
                   <input name="cuit3" value={form.cuit3} onChange={handleChange} required />
                 </div>
                 <br />
-                <div className="form-group">
-                  <label>Nombre del Piloto:</label>
-                  <input name="piloto" value={form.piloto} onChange={handleChange} required />
-                </div>
+                {(form.categoriaAplicadora === "AplicadoraAerea" ||
+                  form.categoriaAplicadora === "AplicadoraDron") && (
+                    <>
+                      <div className="form-group">
+                        <label>Nombre del Piloto:</label>
+                        <input
+                          name="piloto"
+                          value={form.piloto}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
 
-                <div className="form-group">
-                  <label>CUIT Piloto:</label>
-                  <input name="cuit4" value={form.cuit4} onChange={handleChange} required />
-                </div>
+                      <div className="form-group">
+                        <label>CUIT Piloto:</label>
+                        <input
+                          name="cuit4"
+                          value={form.cuit4}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
 
                 <div className="form-group">
                   <label>Tipo de Máquina:</label>
@@ -429,17 +491,25 @@ function App() {
                 <input type="email" name="emailAsesor" value={form.emailAsesor} onChange={handleChange} required />
               </div>
               <br />
-              <div className="form-group full">
-                <legend>En este mail el piloto recibira una copia de la receta</legend>
-                <label>Correo Electrónico del Piloto:</label>
-                <input type="email" name="emailPiloto" value={form.emailPiloto} onChange={handleChange} required />
-              </div>
+
+              {(form.categoriaAplicadora === "AplicadoraAerea" ||
+                form.categoriaAplicadora === "AplicadoraDron") && (
+                  <>
+                    <div className="form-group full">
+                      <legend>En este mail el piloto recibira una copia de la receta</legend>
+                      <label>Correo Electrónico del Piloto:</label>
+                      <input type="email" name="emailPiloto" value={form.emailPiloto} onChange={handleChange} required />
+                    </div>
+                  </>
+                )}
 
             </div>
 
           </div>
 
-          <button type="submit">Generar Receta</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Generando..." : "Generar Receta"}
+          </button>
         </form>
 
         {/*Modal de respuesta */}
@@ -451,6 +521,14 @@ function App() {
             <button id="cerrarModal" onClick={cerrarModalExito}>Aceptar</button>
           </div>
         </div>
+
+        {loading && (
+          <div className="loading-overlay">
+            <div className="spinner"></div>
+            <p>Generando receta...</p>
+          </div>
+        )}
+
       </div>
     </>
   )
