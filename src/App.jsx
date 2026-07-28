@@ -10,6 +10,11 @@ function App() {
 
   const [loading, setLoading] = useState(false);
 
+  // Estado para el modal
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [mensajeModal, setMensajeModal] = useState("");
+  const [onConfirm, setOnConfirm] = useState(null);
+
   const [form, setForm] = useState({
     fechaAplicacion: "",
     asesor: "",
@@ -71,11 +76,6 @@ function App() {
       ...form,
       [e.target.name]: e.target.value
     });
-
-    console.log("Formulario actualizado:", {
-      ...form,
-      [e.target.name]: e.target.value
-    });
   };
 
   // Validación de fecha: mínimo 24 horas desde ahora, máximo 7 días desde ahora
@@ -90,17 +90,17 @@ function App() {
   const minDateStr = minDate.toISOString().split("T")[0];
   const maxDateStr = maxDate.toISOString().split("T")[0];
 
-
+  // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar que se haya dibujado un polígono y que la fecha sea correcta
+    // 1. Validar que se haya dibujado un polígono y que la fecha sea correcta
     if (!form.fechaAplicacion || form.poligono.length === 0) {
       abrirModalExito("Por favor, dibuje el polígono del predio tratado en el mapa.");
       return;
     }
 
-    // Validar que la fecha esté dentro del rango permitido
+    // 2. Validar que la fecha esté dentro del rango permitido
     const fechaAplicacion = form.fechaAplicacion;
 
     if (fechaAplicacion < minDateStr || fechaAplicacion > maxDateStr) {
@@ -110,9 +110,10 @@ function App() {
       return;
     }
 
-    // Validar que los correos electrónicos sean válidos
+    // 3. Validar que los correos electrónicos sean válidos
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    // 4. Validar correos electrónicos según la categoría de aplicadora
     if (!emailRegex.test(form.emailEmpresa)) {
       abrirModalExito("Por favor, ingrese un correo electrónico válido para la empresa.");
       return;
@@ -128,8 +129,18 @@ function App() {
       return;
     }
 
-    try {
+    // 5. Abrimos el modal de confirmación antes de enviar los datos
+    abrirModalExito(
+      "¿Está seguro de enviar la información?",
+      enviarFormulario
+    );
 
+  };
+
+  // Función para enviar el formulario al backend
+  const enviarFormulario = async () => {
+
+    try {
       setLoading(true); // INICIA CARGA
 
       // 1. 👈 Pedimos la imagen al mapa (esto es asíncrono)
@@ -144,19 +155,18 @@ function App() {
         emailPiloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "" : form.emailPiloto
       };
 
-      console.log("Enviando formulario:", dataToSend);
-
+      // 3. Enviar los datos al backend
       const res = await axios.post(
-        import.meta.env.VITE_URL_BACKEND,
-        dataToSend
-      );
+     `${import.meta.env.VITE_URL_BACKEND}/generar-pdf`,
+     dataToSend
+   );
 
       if (res.data.ok) {
         abrirModalExito(res.data.mensaje || "Datos enviados correctamente.");
       } else {
         abrirModalExito("Hubo un problema al procesar la solicitud.");
+        return;
       }
-
 
       // reiniciar el formulario
       setForm({
@@ -193,14 +203,15 @@ function App() {
         ]
       });
 
-      //funcion para refrescar el mapa
-      refreshMap();
+      //reinicar el mapa
+      if (mapViewRef.current) {
+        mapViewRef.current.getMapImage(); // Esto forzará a MapView a refrescar su estado interno y, por ende, el mapa
+      }
 
     } catch (error) {
       console.error(error);
-      abrirModalExito("Error al generar el PDF");
-    }
-    finally {
+      abrirModalExito("Error al enviar el formulario. Por favor, inténtelo de nuevo.");
+    } finally {
       setLoading(false); // TERMINA CARGA
     }
   };
@@ -250,16 +261,22 @@ function App() {
   };
 
   //modal
-  const abrirModalExito = (mensaje) => {
-    const modal = document.getElementById("modalExito");
-    const mensajeModal = document.getElementById("mensajeModal");
-    mensajeModal.textContent = mensaje;
-    modal.style.display = "flex";
+  const abrirModalExito = (mensaje, callback = null) => {
+    setMensajeModal(mensaje);
+    setOnConfirm(() => callback);
+    setModalAbierto(true);
   };
 
-  const cerrarModalExito = () => {
-    const modal = document.getElementById("modalExito");
-    modal.style.display = "none";
+  const aceptarModal = () => {
+    setModalAbierto(false);
+
+    if (onConfirm) {
+      onConfirm();
+    }
+  };
+
+  const cancelarModal = () => {
+    setModalAbierto(false);
   };
 
 
@@ -284,12 +301,12 @@ function App() {
 
 
                 <div className="form-group">
-                  <label>Asesor:</label>
+                  <label>Asesor(Nombre completo):</label>
                   <input name="asesor" value={form.asesor} onChange={handleChange} required />
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT asesor:(xx-xxxxxxxx-x)</label>
+                  <label>CUIT asesor(xx-xxxxxxxx-x):</label>
                   <input name="cuit1" value={form.cuit1} onChange={handleChange} required />
                 </div>
 
@@ -299,7 +316,7 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT Empresa Productora:(xx-xxxxxxxx-x)</label>
+                  <label>CUIT Empresa Productora(xx-xxxxxxxx-x):</label>
                   <input name="cuit2" value={form.cuit2} onChange={handleChange} required />
                 </div>
 
@@ -319,7 +336,7 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT Aplicadora:(xx-xxxxxxxx-x)</label>
+                  <label>CUIT Aplicadora(xx-xxxxxxxx-x):</label>
                   <input name="cuit3" value={form.cuit3} onChange={handleChange} required />
                 </div>
                 <br />
@@ -327,7 +344,7 @@ function App() {
                   form.categoriaAplicadora === "AplicadoraDron") && (
                     <>
                       <div className="form-group">
-                        <label>Nombre del Piloto:</label>
+                        <label>Piloto(Nombre completo):</label>
                         <input
                           name="piloto"
                           value={form.piloto}
@@ -337,7 +354,7 @@ function App() {
                       </div>
 
                       <div className="form-group">
-                        <label>CUIT Piloto:</label>
+                        <label>CUIT Piloto(xx-xxxxxxxx-x):</label>
                         <input
                           name="cuit4"
                           value={form.cuit4}
@@ -507,20 +524,31 @@ function App() {
 
           </div>
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Generando..." : "Generar Receta"}
+          <button type="submit">
+            Generar Receta
           </button>
         </form>
 
         {/*Modal de respuesta */}
 
-        <div id="modalExito" className="modal">
-          <div className="modal-contenido">
-            <h2>La operación realizada con exito</h2>
-            <p id="mensajeModal">La operación se realizó correctamente.</p>
-            <button id="cerrarModal" onClick={cerrarModalExito}>Aceptar</button>
+        {modalAbierto && (
+          <div className="modal">
+            <div className="modal-contenido">
+              <h2>Confirmación</h2>
+
+              <p>{mensajeModal}</p>
+
+              <button onClick={aceptarModal}>
+                Aceptar
+              </button>
+
+              <button onClick={cancelarModal}>
+                Cancelar
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+
 
         {loading && (
           <div className="loading-overlay">
