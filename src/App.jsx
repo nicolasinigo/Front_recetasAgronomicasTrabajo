@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import axios from 'axios'
 import './App.css'
 import MapView from './mapview/MapView.jsx'
+import { Turnstile } from "@marsidev/react-turnstile";
 
 
 function App() {
@@ -14,6 +15,10 @@ function App() {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [mensajeModal, setMensajeModal] = useState("");
   const [onConfirm, setOnConfirm] = useState(null);
+
+  // Estado para el captcha
+  const [captchaValidado, setCaptchaValidado] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
 
   const [form, setForm] = useState({
     fechaAplicacion: "",
@@ -152,14 +157,15 @@ function App() {
         mapaImagen: mapImageBase64, // Este es un string larguísimo (Base64)
         piloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.piloto,
         cuit4: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.cuit4,
-        emailPiloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "" : form.emailPiloto
+        emailPiloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "" : form.emailPiloto,
+        captchaToken: captchaToken // Enviamos el token del captcha al backend
       };
 
       // 3. Enviar los datos al backend
       const res = await axios.post(
-     `${import.meta.env.VITE_URL_BACKEND}/generar-pdf`,
-     dataToSend
-   );
+        `/generar-pdf`,
+        dataToSend
+      );
 
       if (res.data.ok) {
         abrirModalExito(res.data.mensaje || "Datos enviados correctamente.");
@@ -280,9 +286,38 @@ function App() {
   };
 
 
+  if (!captchaValidado) {
+    return (
+      <div className="captcha-page">
+        <div className="captcha-box">
+          <h1>Receta Agroquímica</h1>
+          <p>
+            Para acceder al formulario debe verificar que no es un robot.
+          </p>
+
+          <Turnstile
+            siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+            onSuccess={(token) => {
+              console.log("Captcha válido");
+              console.log(token);
+              setCaptchaToken(token);
+              setCaptchaValidado(true);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <>
       <div className="form-container">
+
+        <div>
+          <img src="/direccion-de-agricultura.png" alt="Logo Gobierno de Tucumán" style={{ width: "500px", height: "auto" }} />
+        </div>
+
         <h2>Receta Agroquímica de Aplicación</h2>
 
         <form onSubmit={handleSubmit}>

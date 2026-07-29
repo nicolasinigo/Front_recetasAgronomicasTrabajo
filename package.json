@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@geoman-io/leaflet-geoman-free": "^2.19.3",
+    "@marsidev/react-turnstile": "^1.5.4",
     "axios": "^1.15.2",
     "dotenv": "^17.4.2",
     "html2canvas": "^1.4.1",
