@@ -3,6 +3,7 @@ import axios from 'axios'
 import './App.css'
 import MapView from './mapview/MapView.jsx'
 import { Turnstile } from "@marsidev/react-turnstile";
+import Select from "react-select";
 
 
 function App() {
@@ -32,13 +33,16 @@ function App() {
     piloto: "",
     cuit4: "",
     tipoMaquina: "",
+    modelo: "",
     Matricula: "",
     domicilio: "",
     predio: "",
-    gps: "",
+    latitud: "",
+    longitud: "",
     superficie: "",
     poligono: [],
     cultivo: "",
+    cultivoOtro: "",
     diagnostico: "",
     recomendacion: "",
     emailEmpresa: "",
@@ -53,6 +57,45 @@ function App() {
       }
     ]
   });
+
+  // Opciones de cultivo para el select
+  const cultivoOptions = [
+    { value: "Ajo", label: "Ajo" },
+    { value: "Arándano", label: "Arándano" },
+    { value: "Arveja", label: "Arveja" },
+    { value: "Batata", label: "Batata" },
+    { value: "Caña de azúcar", label: "Caña de azúcar" },
+    { value: "Cebolla", label: "Cebolla" },
+    { value: "Chilto (Tomate de árbol)", label: "Chilto (Tomate de árbol)" },
+    { value: "Frutilla", label: "Frutilla" },
+    { value: "Garbanzo", label: "Garbanzo" },
+    { value: "Lechuga", label: "Lechuga" },
+    { value: "Lenteja", label: "Lenteja" },
+    { value: "Limón", label: "Limón" },
+    { value: "Mandarina", label: "Mandarina" },
+    { value: "Maíz", label: "Maíz" },
+    { value: "Maracuyá", label: "Maracuyá" },
+    { value: "Melón", label: "Melón" },
+    { value: "Naranja", label: "Naranja" },
+    { value: "Palta", label: "Palta" },
+    { value: "Papa", label: "Papa" },
+    { value: "Pimiento morrón", label: "Pimiento morrón" },
+    { value: "Pimiento para pimentón", label: "Pimiento para pimentón" },
+    { value: "Pomelo", label: "Pomelo" },
+    { value: "Poroto alubia", label: "Poroto alubia" },
+    { value: "Poroto blanco", label: "Poroto blanco" },
+    { value: "Poroto negro", label: "Poroto negro" },
+    { value: "Sandía", label: "Sandía" },
+    { value: "Soja", label: "Soja" },
+    { value: "Sorgo", label: "Sorgo" },
+    { value: "Tabaco", label: "Tabaco" },
+    { value: "Tomate", label: "Tomate" },
+    { value: "Trigo", label: "Trigo" },
+    { value: "Vid (Uva)", label: "Vid (Uva)" },
+    { value: "Zanahoria", label: "Zanahoria" },
+    { value: "Zapallo", label: "Zapallo" },
+    { value: "Otros", label: "Otros" },
+  ];
 
 
   // Manejar cambios en el polígono
@@ -161,11 +204,18 @@ function App() {
         captchaToken: captchaToken // Enviamos el token del captcha al backend
       };
 
+      // Validar el campo de cultivo y enviar el valor correcto
+      const cultivoEnviar= form.cultivo === "Otros" ? form.cultivoOtro : form.cultivo;
+      dataToSend.cultivo = cultivoEnviar;
+
+      console.log("Datos a enviar al backend:", dataToSend);
       // 3. Enviar los datos al backend
       const res = await axios.post(
+        //`${import.meta.env.VITE_URL_BACKEND}generar-pdf`,
         `/generar-pdf`,
         dataToSend
       );
+
 
       if (res.data.ok) {
         abrirModalExito(res.data.mensaje || "Datos enviados correctamente.");
@@ -187,13 +237,16 @@ function App() {
         piloto: "",
         cuit4: "",
         tipoMaquina: "",
+        modelo: "",
         Matricula: "",
         domicilio: "",
         predio: "",
-        gps: "",
+        latitud: "",
+        longitud: "",
         superficie: "",
         poligono: [],
         cultivo: "",
+        cultivoOtro: "",
         diagnostico: "",
         recomendacion: "",
         emailEmpresa: "",
@@ -335,27 +388,27 @@ function App() {
 
                 <div className="form-group">
                   <label>Asesor(Nombre completo):</label>
-                  <input name="asesor" value={form.asesor} onChange={handleChange} required />
+                  <input name="asesor" value={form.asesor} onChange={handleChange} required maxLength="50" />
                 </div>
 
                 <div className="form-group">
                   <label>CUIT asesor(xx-xxxxxxxx-x):</label>
-                  <input name="cuit1" value={form.cuit1} onChange={handleChange} required />
+                  <input name="cuit1" value={form.cuit1} onChange={handleChange} required maxLength="13" />
                 </div>
 
                 <div className="form-group">
                   <label>Empresa Productora:</label>
-                  <input name="empresaProductora" value={form.empresaProductora} onChange={handleChange} required />
+                  <input name="empresaProductora" value={form.empresaProductora} onChange={handleChange} required maxLength="50" />
                 </div>
 
                 <div className="form-group">
                   <label>CUIT Empresa Productora(xx-xxxxxxxx-x):</label>
-                  <input name="cuit2" value={form.cuit2} onChange={handleChange} required />
+                  <input name="cuit2" value={form.cuit2} onChange={handleChange} required maxLength="13" />
                 </div>
 
                 <div className="form-group">
                   <label>Nombre de Empresa Aplicadora:</label>
-                  <input name="aplicadora" value={form.aplicadora} onChange={handleChange} required />
+                  <input name="aplicadora" value={form.aplicadora} onChange={handleChange} required maxLength="50" />
                 </div>
 
                 <div className="form-group">
@@ -370,7 +423,7 @@ function App() {
 
                 <div className="form-group">
                   <label>CUIT Aplicadora(xx-xxxxxxxx-x):</label>
-                  <input name="cuit3" value={form.cuit3} onChange={handleChange} required />
+                  <input name="cuit3" value={form.cuit3} onChange={handleChange} required maxLength="13" />
                 </div>
                 <br />
                 {(form.categoriaAplicadora === "AplicadoraAerea" ||
@@ -397,38 +450,60 @@ function App() {
                       </div>
                     </>
                   )}
-
-                <div className="form-group">
-                  <label>Tipo de Máquina:</label>
-                  <input name="tipoMaquina" value={form.tipoMaquina} onChange={handleChange} required />
-                </div>
-
-                <div className="form-group">
-                  <label>Matricula de la Máquina:</label>
-                  <input name="Matricula" value={form.Matricula} onChange={handleChange} required />
-                </div>
-
               </div>
             </div>
 
-            <div className="form-group full">
-              <label>Domicilio:</label>
-              <input name="domicilio" value={form.domicilio} onChange={handleChange} required />
+            <div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
+
+              <h4>Tipo de Máquina:</h4>
+
+              <div className="form-group">
+                <label>Marca:</label>
+                <input name="tipoMaquina" value={form.tipoMaquina} onChange={handleChange} required maxLength="50" />
+              </div>
+
+              <div className="form-group">
+                <label>Modelo:</label>
+                <input name="modelo" value={form.modelo} onChange={handleChange} required maxLength="50" />
+              </div>
+
+              <div className="form-group">
+                <label>Matricula de la Máquina:</label>
+                <input name="Matricula" value={form.Matricula} onChange={handleChange} required maxLength="20" />
+              </div>
+
             </div>
 
-            <div className="form-group full">
-              <label>Localización del Predio Tratado:</label>
-              <input name="predio" value={form.predio} onChange={handleChange} required />
-            </div>
+            <div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
 
-            <div className="form-group">
-              <label>Punto GPS:</label>
-              <input name="gps" value={form.gps} onChange={handleChange} required />
-            </div>
+              <h4>Ubicación del Predio:</h4>
+              <div className="form-grid">
 
-            <div className="form-group">
-              <label>Superficie:</label>
-              <input name="superficie" value={form.superficie} onChange={handleChange} required />
+
+                <div className="form-group full">
+                  <label>Domicilio:</label>
+                  <input name="domicilio" value={form.domicilio} onChange={handleChange} required maxLength="50" />
+                </div>
+
+                <div className="form-group full">
+                  <label>Localización del Predio Tratado:</label>
+                  <input name="predio" value={form.predio} onChange={handleChange} required maxLength="100" />
+                </div>
+
+                <div className="form-group">
+                  <label>Latitud:</label>
+                  <input name="latitud" value={form.latitud} onChange={handleChange} required maxLength="100" />
+                </div>
+                <div className="form-group">
+                  <label>Longitud:</label>
+                  <input name="longitud" value={form.longitud} onChange={handleChange} required maxLength="100" />
+                </div>
+
+                <div className="form-group">
+                  <label>Superficie( Km²):</label>
+                  <input name="superficie" value={form.superficie} onChange={handleChange} required maxLength="10" />
+                </div>
+              </div>
             </div>
 
             <div
@@ -442,14 +517,78 @@ function App() {
               </div>
             </div>
 
+
+            {/* mostrar opciones de cultivo en orden alfabético */}
             <div className="form-group">
+
               <label>Cultivo a Tratar:</label>
-              <input name="cultivo" value={form.cultivo} onChange={handleChange} required />
+
+
+
+              <select name="cultivo" value={form.cultivo} onChange={handleChange} required maxlength="20" style={{ height: "40px", fontSize: "16px" }}>
+                <option value="">Seleccione un cultivo</option>
+                <option value="Ajo">Ajo</option>
+                <option value="Arándano">Arándano</option>
+                <option value="Arveja">Arveja</option>
+                <option value="Batata">Batata</option>
+                <option value="Caña de azúcar">Caña de azúcar</option>
+                <option value="Cebolla">Cebolla</option>
+                <option value="Chilto (Tomate de árbol)">Chilto (Tomate de árbol)</option>
+                <option value="Frutilla">Frutilla</option>
+                <option value="Garbanzo">Garbanzo</option>
+                <option value="Lechuga">Lechuga</option>
+                <option value="Lenteja">Lenteja</option>
+                <option value="Limón">Limón</option>
+                <option value="Mandarina">Mandarina</option>
+                <option value="Maíz">Maíz</option>
+                <option value="Maracuyá">Maracuyá</option>
+                <option value="Melón">Melón</option>
+                <option value="Naranja">Naranja</option>
+                <option value="Palta">Palta</option>
+                <option value="Papa">Papa</option>
+                <option value="Pimiento morrón">Pimiento morrón</option>
+                <option value="Pimiento para pimentón">Pimiento para pimentón</option>
+                <option value="Pomelo">Pomelo</option>
+                <option value="Poroto alubia">Poroto alubia</option>
+                <option value="Poroto blanco">Poroto blanco</option>
+                <option value="Poroto negro">Poroto negro</option>
+                <option value="Sandía">Sandía</option>
+                <option value="Soja">Soja</option>
+                <option value="Sorgo">Sorgo</option>
+                <option value="Tabaco">Tabaco</option>
+                <option value="Tomate">Tomate</option>
+                <option value="Trigo">Trigo</option>
+                <option value="Vid (Uva)">Vid (Uva)</option>
+                <option value="Zanahoria">Zanahoria</option>
+                <option value="Zapallo">Zapallo</option>
+                <option value="Otros">Otros</option>
+              </select>
+
             </div>
+            {form.cultivo === "Otros" && (
+              <input
+                type="text"
+                name="cultivoOtro"
+                value={form.cultivoOtro}
+                onChange={handleChange}
+                placeholder="Nombre del cultivo"
+                required
+                maxLength={50}
+                style={{
+                  width: "92%",
+                  height: "20px",
+                  fontsize: "14px",
+                  marginTop: "30px",
+                  color: "#555"
+                }}
+              />
+            )}
+
+
 
             <div className="form-group full">
               <label>Diagnóstico:</label>
-              <input name="diagnostico" value={form.diagnostico} onChange={handleChange} required />
+              <input name="diagnostico" value={form.diagnostico} onChange={handleChange} required maxLength="100" />
             </div>
 
             {/* Campo dinámico para agroquímicos */}
@@ -467,6 +606,7 @@ function App() {
                       value={agro.principioActivo}
                       onChange={(e) => handleAgroChange(index, e)}
                       required
+                      maxLength="20"
                     />
                   </div>
 
@@ -477,26 +617,29 @@ function App() {
                       value={agro.nomencComercial}
                       onChange={(e) => handleAgroChange(index, e)}
                       required
+                      maxLength="50"
                     />
                   </div>
 
                   <div className="form-group">
-                    <label>Dosis</label>
+                    <label>Dosis(mililitros)</label>
                     <input
                       name="dosis"
                       value={agro.dosis}
                       onChange={(e) => handleAgroChange(index, e)}
                       required
+                      maxLength="10"
                     />
                   </div>
 
                   <div className="form-group">
-                    <label>Cantidad Total</label>
+                    <label>Cantidad Total(litros)</label>
                     <input
                       name="cantidadTotal"
                       value={agro.cantidadTotal}
                       onChange={(e) => handleAgroChange(index, e)}
                       required
+                      maxLength="10"
                     />
                   </div>
 
@@ -524,7 +667,7 @@ function App() {
             {/* Fin campo de agroquímicos */}
             <div className="form-group full">
               <label>Recomendación Técnicas:</label>
-              <textarea name="recomendacion" value={form.recomendacion} onChange={handleChange} />
+              <textarea name="recomendacion" value={form.recomendacion} onChange={handleChange} maxLength="200" />
             </div>
 
             <div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
@@ -532,7 +675,7 @@ function App() {
               <div className="form-group full">
                 <legend>En este mail usted recibira la receta</legend>
                 <label>Correo Electrónico Empresa:</label>
-                <input type="email" name="emailEmpresa" value={form.emailEmpresa} onChange={handleChange} required />
+                <input type="email" name="emailEmpresa" value={form.emailEmpresa} onChange={handleChange} required maxLength="100" />
               </div>
               <br />
               <div className="form-group full">
