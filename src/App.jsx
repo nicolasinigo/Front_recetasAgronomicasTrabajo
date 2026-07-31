@@ -626,7 +626,6 @@ function App() {
                   height: "20px",
                   fontSize: "14px",
                   marginTop: "30px",
-                  color: "white"
                 }}
               />
             )}
