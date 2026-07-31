@@ -224,7 +224,8 @@ function App() {
       const dataToSend = {
         ...form,
         mapaImagen: mapImageBase64, // Este es un string larguísimo (Base64)
-        piloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.piloto,
+        pilotoApellido: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.pilotoApellido,
+        pilotoNombres: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.pilotoNombres,
         cuit4: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.cuit4,
         emailPiloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "" : form.emailPiloto,
         captchaToken: captchaToken // Enviamos el token del captcha al backend
@@ -233,6 +234,8 @@ function App() {
       // Validar el campo de cultivo y enviar el valor correcto
       const cultivoEnviar = form.cultivo === "Otros" ? form.cultivoOtro : form.cultivo;
       dataToSend.cultivo = cultivoEnviar;
+
+      console.log("Datos a enviar al backend:", dataToSend); // Para depuración
 
       // 3. Enviar los datos al backend
       const res = await axios.post(
@@ -473,6 +476,7 @@ function App() {
                           value={form.pilotoApellido}
                           onChange={handleChange}
                           required
+                          maxLength="30"
                         />
                       </div>
 
@@ -483,6 +487,7 @@ function App() {
                           value={form.pilotoNombres}
                           onChange={handleChange}
                           required
+                          maxLength="30"
                         />
                       </div>
 
@@ -493,6 +498,7 @@ function App() {
                           value={form.cuit4}
                           onChange={handleChange}
                           required
+                          maxLength="13"
                         />
                       </div>
                     </>
