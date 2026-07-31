@@ -23,14 +23,16 @@ function App() {
 
   const [form, setForm] = useState({
     fechaAplicacion: "",
-    asesor: "",
+    asesorApellido: "",
+    asesorNombres: "",
     cuit1: "",
     empresaProductora: "",
     cuit2: "",
     aplicadora: "",
     categoriaAplicadora: "",
     cuit3: "",
-    piloto: "",
+    pilotoApellido: "",
+    pilotoNombres: "",
     cuit4: "",
     tipoMaquina: "",
     modelo: "",
@@ -126,6 +128,30 @@ function App() {
     });
   };
 
+  // Manejar cambios en el campo de latitud, permitiendo solo números y un punto decimal
+  const handleLatitud = (e) => {
+    const value = e.target.value;
+
+    if (/^-?\d*\.?\d*$/.test(value)) {
+      setForm({
+        ...form,
+        latitud: value,
+      });
+    }
+  };
+
+  // Manejar cambios en el campo de longitud, permitiendo solo números y un punto decimal
+  const handleLongitud = (e) => {
+    const value = e.target.value;
+
+    if (/^-?\d*\.?\d*$/.test(value)) {
+      setForm({
+        ...form,
+        longitud: value,
+      });
+    }
+  };
+
   // Validación de fecha: mínimo 24 horas desde ahora, máximo 7 días desde ahora
   const hoy = new Date();
 
@@ -205,7 +231,7 @@ function App() {
       };
 
       // Validar el campo de cultivo y enviar el valor correcto
-      const cultivoEnviar= form.cultivo === "Otros" ? form.cultivoOtro : form.cultivo;
+      const cultivoEnviar = form.cultivo === "Otros" ? form.cultivoOtro : form.cultivo;
       dataToSend.cultivo = cultivoEnviar;
 
       // 3. Enviar los datos al backend
@@ -226,14 +252,16 @@ function App() {
       // reiniciar el formulario
       setForm({
         fechaAplicacion: "",
-        asesor: "",
+        asesorApellido: "",
+        asesorNombres: "",
         cuit1: "",
         empresaProductora: "",
         cuit2: "",
         aplicadora: "",
         categoriaAplicadora: "",
         cuit3: "",
-        piloto: "",
+        pilotoApellido: "",
+        pilotoNombres: "",
         cuit4: "",
         tipoMaquina: "",
         modelo: "",
@@ -365,7 +393,7 @@ function App() {
       <div className="form-container">
 
         <div>
-          <img src="/direccion-de-agricultura.png" alt="Logo Gobierno de Tucumán" style={{ width: "500px", height: "auto" }} />
+          <img src="/direccion-de-agricultura.png" alt="Logo Gobierno de Tucumán" style={{ width: "500px", height: "100px" }} />
         </div>
 
         <h2>Receta Agroquímica de Aplicación</h2>
@@ -386,14 +414,24 @@ function App() {
 
 
                 <div className="form-group">
-                  <label>Asesor(Nombre completo):</label>
-                  <input name="asesor" value={form.asesor} onChange={handleChange} required maxLength="30" />
+                  <label>Asesor Apellido:</label>
+                  <input name="asesorApellido" value={form.asesorApellido} onChange={handleChange} required maxLength="30" />
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT asesor(xx-xxxxxxxx-x):</label>
+                  <label>Asesor Nombre/s:</label>
+                  <input name="asesorNombres" value={form.asesorNombres} onChange={handleChange} required maxLength="30" />
+                </div>
+
+                <div className="form-group">
+                  <label>CUIT asesor (xx-xxxxxxxx-x):</label>
                   <input name="cuit1" value={form.cuit1} onChange={handleChange} required maxLength="13" />
                 </div>
+
+              </div>
+
+              <div className="form-grid">
+
 
                 <div className="form-group">
                   <label>Empresa Productora:</label>
@@ -401,7 +439,7 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT Empresa Productora(xx-xxxxxxxx-x):</label>
+                  <label>CUIT Empresa Productora (xx-xxxxxxxx-x):</label>
                   <input name="cuit2" value={form.cuit2} onChange={handleChange} required maxLength="13" />
                 </div>
 
@@ -421,7 +459,7 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT Aplicadora(xx-xxxxxxxx-x):</label>
+                  <label>CUIT Aplicadora (xx-xxxxxxxx-x):</label>
                   <input name="cuit3" value={form.cuit3} onChange={handleChange} required maxLength="13" />
                 </div>
                 <br />
@@ -429,17 +467,27 @@ function App() {
                   form.categoriaAplicadora === "AplicadoraDron") && (
                     <>
                       <div className="form-group">
-                        <label>Piloto(Nombre completo):</label>
+                        <label>Piloto Apellido:</label>
                         <input
-                          name="piloto"
-                          value={form.piloto}
+                          name="pilotoApellido"
+                          value={form.pilotoApellido}
                           onChange={handleChange}
                           required
                         />
                       </div>
 
                       <div className="form-group">
-                        <label>CUIT Piloto(xx-xxxxxxxx-x):</label>
+                        <label>Piloto Nombre/s:</label>
+                        <input
+                          name="pilotoNombres"
+                          value={form.pilotoNombres}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>CUIT Piloto (xx-xxxxxxxx-x):</label>
                         <input
                           name="cuit4"
                           value={form.cuit4}
@@ -491,16 +539,16 @@ function App() {
 
                 <div className="form-group">
                   <label>Latitud:</label>
-                  <input name="latitud" value={form.latitud} onChange={handleChange} required maxLength="30" />
+                  <input name="latitud" value={form.latitud} onChange={handleLatitud} inputMode='decimal' required maxLength="30" />
                 </div>
                 <div className="form-group">
                   <label>Longitud:</label>
-                  <input name="longitud" value={form.longitud} onChange={handleChange} required maxLength="30" />
+                  <input name="longitud" value={form.longitud} onChange={handleLongitud} inputMode='decimal' required maxLength="30" />
                 </div>
 
                 <div className="form-group">
-                  <label>Superficie( Km²):</label>
-                  <input name="superficie" value={form.superficie} onChange={handleChange} required maxLength="10" />
+                  <label>Superficie ( Km²):</label>
+                  <input type="number" min={0} name="superficie" value={form.superficie} onChange={handleChange} required maxLength="10" />
                 </div>
               </div>
             </div>
@@ -576,9 +624,9 @@ function App() {
                 style={{
                   width: "92%",
                   height: "20px",
-                  fontsize: "14px",
+                  fontSize: "14px",
                   marginTop: "30px",
-                  color: "#555"
+                  color: "white"
                 }}
               />
             )}
@@ -621,8 +669,10 @@ function App() {
                   </div>
 
                   <div className="form-group">
-                    <label>Dosis(mililitros)</label>
+                    <label>Dosis (ml)</label>
                     <input
+                      type="number"
+                      min={0}
                       name="dosis"
                       value={agro.dosis}
                       onChange={(e) => handleAgroChange(index, e)}
@@ -632,8 +682,10 @@ function App() {
                   </div>
 
                   <div className="form-group">
-                    <label>Cantidad Total(litros)</label>
+                    <label>Cantidad Total (lt)</label>
                     <input
+                      type="number"
+                      min={0}
                       name="cantidadTotal"
                       value={agro.cantidadTotal}
                       onChange={(e) => handleAgroChange(index, e)}
