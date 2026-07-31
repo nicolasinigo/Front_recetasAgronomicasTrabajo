@@ -388,7 +388,7 @@ function App() {
 
                 <div className="form-group">
                   <label>Asesor(Nombre completo):</label>
-                  <input name="asesor" value={form.asesor} onChange={handleChange} required maxLength="50" />
+                  <input name="asesor" value={form.asesor} onChange={handleChange} required maxLength="30" />
                 </div>
 
                 <div className="form-group">
@@ -398,7 +398,7 @@ function App() {
 
                 <div className="form-group">
                   <label>Empresa Productora:</label>
-                  <input name="empresaProductora" value={form.empresaProductora} onChange={handleChange} required maxLength="50" />
+                  <input name="empresaProductora" value={form.empresaProductora} onChange={handleChange} required maxLength="30" />
                 </div>
 
                 <div className="form-group">
@@ -408,7 +408,7 @@ function App() {
 
                 <div className="form-group">
                   <label>Nombre de Empresa Aplicadora:</label>
-                  <input name="aplicadora" value={form.aplicadora} onChange={handleChange} required maxLength="50" />
+                  <input name="aplicadora" value={form.aplicadora} onChange={handleChange} required maxLength="30" />
                 </div>
 
                 <div className="form-group">
@@ -459,7 +459,7 @@ function App() {
 
               <div className="form-group">
                 <label>Marca:</label>
-                <input name="tipoMaquina" value={form.tipoMaquina} onChange={handleChange} required maxLength="50" />
+                <input name="tipoMaquina" value={form.tipoMaquina} onChange={handleChange} required maxLength="30" />
               </div>
 
               <div className="form-group">
@@ -492,11 +492,11 @@ function App() {
 
                 <div className="form-group">
                   <label>Latitud:</label>
-                  <input name="latitud" value={form.latitud} onChange={handleChange} required maxLength="100" />
+                  <input name="latitud" value={form.latitud} onChange={handleChange} required maxLength="30" />
                 </div>
                 <div className="form-group">
                   <label>Longitud:</label>
-                  <input name="longitud" value={form.longitud} onChange={handleChange} required maxLength="100" />
+                  <input name="longitud" value={form.longitud} onChange={handleChange} required maxLength="30" />
                 </div>
 
                 <div className="form-group">
@@ -573,7 +573,7 @@ function App() {
                 onChange={handleChange}
                 placeholder="Nombre del cultivo"
                 required
-                maxLength={50}
+                maxLength={20}
                 style={{
                   width: "92%",
                   height: "20px",
@@ -617,7 +617,7 @@ function App() {
                       value={agro.nomencComercial}
                       onChange={(e) => handleAgroChange(index, e)}
                       required
-                      maxLength="50"
+                      maxLength="30"
                     />
                   </div>
 
@@ -675,13 +675,13 @@ function App() {
               <div className="form-group full">
                 <legend>En este mail usted recibira la receta</legend>
                 <label>Correo Electrónico Empresa:</label>
-                <input type="email" name="emailEmpresa" value={form.emailEmpresa} onChange={handleChange} required maxLength="100" />
+                <input type="email" name="emailEmpresa" value={form.emailEmpresa} onChange={handleChange} required maxLength="40" />
               </div>
               <br />
               <div className="form-group full">
                 <legend>En este mail el asesor recibira una copia de la receta</legend>
                 <label>Correo Electrónico del Asesor:</label>
-                <input type="email" name="emailAsesor" value={form.emailAsesor} onChange={handleChange} required />
+                <input type="email" name="emailAsesor" value={form.emailAsesor} onChange={handleChange} required maxLength="40" />
               </div>
               <br />
 
@@ -691,7 +691,7 @@ function App() {
                     <div className="form-group full">
                       <legend>En este mail el piloto recibira una copia de la receta</legend>
                       <label>Correo Electrónico del Piloto:</label>
-                      <input type="email" name="emailPiloto" value={form.emailPiloto} onChange={handleChange} required />
+                      <input type="email" name="emailPiloto" value={form.emailPiloto} onChange={handleChange} required maxLength="40" />
                     </div>
                   </>
                 )}
