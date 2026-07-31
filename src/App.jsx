@@ -208,7 +208,6 @@ function App() {
       const cultivoEnviar= form.cultivo === "Otros" ? form.cultivoOtro : form.cultivo;
       dataToSend.cultivo = cultivoEnviar;
 
-      console.log("Datos a enviar al backend:", dataToSend);
       // 3. Enviar los datos al backend
       const res = await axios.post(
         //`${import.meta.env.VITE_URL_BACKEND}generar-pdf`,
