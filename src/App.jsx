@@ -236,8 +236,8 @@ function App() {
       dataToSend.cultivo = cultivoEnviar;
 
       // 3. Enviar los datos al backend
+      //`${import.meta.env.VITE_URL_BACKEND}generar-pdf`,
       const res = await axios.post(
-        //`${import.meta.env.VITE_URL_BACKEND}generar-pdf`,
         `/generar-pdf`,
         dataToSend
       );
@@ -551,7 +551,7 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>Superficie ( Km²):</label>
+                  <label>Superficie (Km²):</label>
                   <input type="number" min={0} name="superficie" value={form.superficie} onChange={handleChange} required maxLength="10" />
                 </div>
               </div>
