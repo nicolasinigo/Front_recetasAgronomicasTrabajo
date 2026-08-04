@@ -226,10 +226,28 @@ function App() {
         mapaImagen: mapImageBase64, // Este es un string larguísimo (Base64)
         pilotoApellido: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.pilotoApellido,
         pilotoNombres: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.pilotoNombres,
-        cuit4: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.cuit4,
+        cuit4: form.categoriaAplicadora === "AplicadoraTerrestre" ? "-----------" : form.cuit4,
         emailPiloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "" : form.emailPiloto,
         captchaToken: captchaToken // Enviamos el token del captcha al backend
       };
+
+      // Validar que los CUIT tengan exactamente 11 dígitos, en caso contrario, no enviar el formulario y mostrar un mensaje de error con mensajeModal
+      if (String(form.cuit1).length !== 11) {
+        abrirModalExito("El CUIT del Asesor debe tener exactamente 11 dígitos.");
+        return;
+      }
+      if (String(form.cuit2).length !== 11) {
+        abrirModalExito("El CUIT de la Empresa Productora debe tener exactamente 11 dígitos.");
+        return;
+      }
+      if (String(form.cuit3).length !== 11) {
+      abrirModalExito("El CUIT de la Empresa Aplicadora debe tener exactamente 11 dígitos.");
+        return;
+      }
+      if (String(form.cuit4).length !== 11) {
+        abrirModalExito("El CUIT del Piloto debe tener exactamente 11 dígitos.");
+        return;
+      }
 
       // Validar el campo de cultivo y enviar el valor correcto
       const cultivoEnviar = form.cultivo === "Otros" ? form.cultivoOtro : form.cultivo;
@@ -431,6 +449,11 @@ function App() {
                       e.preventDefault();
                     }
                   }} required />
+                  {form.cuit1 && String(form.cuit1).length !== 11 && (
+                    <small style={{ color: "red", fontSize: "12px" }}>
+                      El CUIT debe tener exactamente 11 dígitos.
+                    </small>
+                  )}
                 </div>
 
               </div>
@@ -450,6 +473,11 @@ function App() {
                       e.preventDefault();
                     }
                   }} required />
+                  {form.cuit2 && String(form.cuit2).length !== 11 && (
+                    <small style={{ color: "red", fontSize: "12px" }}>
+                      El CUIT debe tener exactamente 11 dígitos.
+                    </small>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -474,6 +502,11 @@ function App() {
                       e.preventDefault();
                     }
                   }} required />
+                  {form.cuit3 && String(form.cuit3).length !== 11 && (
+                    <small style={{ color: "red", fontSize: "12px" }}>
+                      El CUIT debe tener exactamente 11 dígitos.
+                    </small>
+                  )}
                 </div>
                 <br />
                 {(form.categoriaAplicadora === "AplicadoraAerea" ||
@@ -515,6 +548,11 @@ function App() {
                           }}
                           required
                         />
+                        {form.cuit4 && String(form.cuit4).length !== 11 && (
+                          <small style={{ color: "red", fontSize: "12px" }}>
+                            El CUIT debe tener exactamente 11 dígitos.
+                          </small>
+                        )}
                       </div>
                     </>
                   )}
