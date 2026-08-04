@@ -425,8 +425,12 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT asesor (xx-xxxxxxxx-x):</label>
-                  <input name="cuit1" value={form.cuit1} onChange={handleChange} required maxLength="13" />
+                  <label>CUIT del Asesor:</label>
+                  <input type="number" name="cuit1" value={form.cuit1} onChange={handleChange} onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", ".", ","].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }} required />
                 </div>
 
               </div>
@@ -440,28 +444,36 @@ function App() {
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT Empresa Productora (xx-xxxxxxxx-x):</label>
-                  <input name="cuit2" value={form.cuit2} onChange={handleChange} required maxLength="13" />
+                  <label>CUIT de la Empresa Productora:</label>
+                  <input type="number" name="cuit2" value={form.cuit2} onChange={handleChange} onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", ".", ","].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }} required />
                 </div>
 
                 <div className="form-group">
-                  <label>Nombre de Empresa Aplicadora:</label>
+                  <label>Nombre de la Empresa Aplicadora:</label>
                   <input name="aplicadora" value={form.aplicadora} onChange={handleChange} required maxLength="30" />
                 </div>
 
                 <div className="form-group">
-                  <label>Categoria de Empresa Aplicadora:</label>
+                  <label>Categoría de Empresa Aplicadora:</label>
                   <select name="categoriaAplicadora" value={form.categoriaAplicadora} onChange={handleChange} required>
                     <option value="">Seleccione una categoría</option>
-                    <option value="AplicadoraAerea">Aplicadora Aerea</option>
+                    <option value="AplicadoraAerea">Aplicadora Aérea</option>
                     <option value="AplicadoraTerrestre">Aplicadora Terrestre</option>
-                    <option value="AplicadoraDron">Aplicacion con Dron</option>
+                    <option value="AplicadoraDron">Aplicación con Dron</option>
                   </select>
                 </div>
 
                 <div className="form-group">
-                  <label>CUIT Aplicadora (xx-xxxxxxxx-x):</label>
-                  <input name="cuit3" value={form.cuit3} onChange={handleChange} required maxLength="13" />
+                  <label>CUIT Aplicadora:</label>
+                  <input type="number" name="cuit3" value={form.cuit3} onChange={handleChange} onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", ".", ","].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }} required />
                 </div>
                 <br />
                 {(form.categoriaAplicadora === "AplicadoraAerea" ||
@@ -490,13 +502,18 @@ function App() {
                       </div>
 
                       <div className="form-group">
-                        <label>CUIT Piloto (xx-xxxxxxxx-x):</label>
+                        <label>CUIT del Piloto:</label>
                         <input
+                          type="number"
                           name="cuit4"
                           value={form.cuit4}
                           onChange={handleChange}
+                          onKeyDown={(e) => {
+                            if (["e", "E", "+", "-", ".", ","].includes(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
                           required
-                          maxLength="13"
                         />
                       </div>
                     </>
@@ -519,7 +536,7 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label>Matricula de la Máquina:</label>
+                <label>Matrícula de la Máquina:</label>
                 <input name="Matricula" value={form.Matricula} onChange={handleChange} required maxLength="20" />
               </div>
 
@@ -543,16 +560,20 @@ function App() {
 
                 <div className="form-group">
                   <label>Latitud:</label>
-                  <input name="latitud" value={form.latitud} onChange={handleLatitud} inputMode='decimal' required maxLength="30" />
+                  <input type="number" step="0.0001" min={-90} max={90} name="latitud" value={form.latitud} onChange={handleLatitud} required />
                 </div>
                 <div className="form-group">
                   <label>Longitud:</label>
-                  <input name="longitud" value={form.longitud} onChange={handleLongitud} inputMode='decimal' required maxLength="30" />
+                  <input type="number" step="0.0001" min={-180} max={180} name="longitud" value={form.longitud} onChange={handleLongitud} required />
                 </div>
 
                 <div className="form-group">
                   <label>Superficie (Km²):</label>
-                  <input type="number" min={0} name="superficie" value={form.superficie} onChange={handleChange} required maxLength="10" />
+                  <input type="number" min={0} name="superficie" value={form.superficie} onChange={handleChange} onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", "."].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }} required />
                 </div>
               </div>
             </div>
@@ -679,8 +700,12 @@ function App() {
                       name="dosis"
                       value={agro.dosis}
                       onChange={(e) => handleAgroChange(index, e)}
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-"].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                       required
-                      maxLength="10"
                     />
                   </div>
 
@@ -692,8 +717,12 @@ function App() {
                       name="cantidadTotal"
                       value={agro.cantidadTotal}
                       onChange={(e) => handleAgroChange(index, e)}
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-"].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                       required
-                      maxLength="10"
                     />
                   </div>
 
@@ -720,20 +749,20 @@ function App() {
 
             {/* Fin campo de agroquímicos */}
             <div className="form-group full">
-              <label>Recomendación Técnicas:</label>
+              <label>Recomendaciones Técnicas:</label>
               <textarea name="recomendacion" value={form.recomendacion} onChange={handleChange} maxLength="200" />
             </div>
 
             <div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
               {/* mail por el cual se enviara la receta */}
               <div className="form-group full">
-                <legend>En este mail usted recibira la receta</legend>
+                <legend>En este correo electrónico usted recibirá la receta</legend>
                 <label>Correo Electrónico Empresa:</label>
                 <input type="email" name="emailEmpresa" value={form.emailEmpresa} onChange={handleChange} required maxLength="40" />
               </div>
               <br />
               <div className="form-group full">
-                <legend>En este mail el asesor recibira una copia de la receta</legend>
+                <legend>En este correo electrónico el asesor recibirá una copia de la receta</legend>
                 <label>Correo Electrónico del Asesor:</label>
                 <input type="email" name="emailAsesor" value={form.emailAsesor} onChange={handleChange} required maxLength="40" />
               </div>
@@ -743,7 +772,7 @@ function App() {
                 form.categoriaAplicadora === "AplicadoraDron") && (
                   <>
                     <div className="form-group full">
-                      <legend>En este mail el piloto recibira una copia de la receta</legend>
+                      <legend>En este correo electrónico el piloto recibirá una copia de la receta.</legend>
                       <label>Correo Electrónico del Piloto:</label>
                       <input type="email" name="emailPiloto" value={form.emailPiloto} onChange={handleChange} required maxLength="40" />
                     </div>
