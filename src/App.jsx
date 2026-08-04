@@ -130,26 +130,56 @@ function App() {
 
   // Manejar cambios en el campo de latitud, permitiendo solo números y un punto decimal
   const handleLatitud = (e) => {
-    const value = e.target.value;
+    let valor = e.target.value;
 
-    if (/^-?\d*\.?\d*$/.test(value)) {
-      setForm({
-        ...form,
-        latitud: value,
-      });
-    }
+    // Cambia coma por punto
+    valor = valor.replace(",", ".");
+
+    // Solo permite números, un - y un .
+    valor = valor.replace(/[^0-9.-]/g, "");
+
+    // Solo un -
+    const menos = (valor.match(/-/g) || []).length;
+    if (menos > 1) return;
+
+    // El - solo al principio
+    if (valor.includes("-") && valor.indexOf("-") !== 0) return;
+
+    // Solo un .
+    const puntos = (valor.match(/\./g) || []).length;
+    if (puntos > 1) return;
+
+    setForm({
+      ...form,
+      latitud: valor,
+    });
   };
 
   // Manejar cambios en el campo de longitud, permitiendo solo números y un punto decimal
   const handleLongitud = (e) => {
-    const value = e.target.value;
+    let valor = e.target.value;
 
-    if (/^-?\d*\.?\d*$/.test(value)) {
-      setForm({
-        ...form,
-        longitud: value,
-      });
-    }
+    // Cambia coma por punto
+    valor = valor.replace(",", ".");
+
+    // Solo permite números, un - y un .
+    valor = valor.replace(/[^0-9.-]/g, "");
+
+    // Solo un -
+    const menos = (valor.match(/-/g) || []).length;
+    if (menos > 1) return;
+
+    // El - solo al principio
+    if (valor.includes("-") && valor.indexOf("-") !== 0) return;
+
+    // Solo un .
+    const puntos = (valor.match(/\./g) || []).length;
+    if (puntos > 1) return;
+
+    setForm({
+      ...form,
+      longitud: valor,
+    });
   };
 
   // Validación de fecha: mínimo 24 horas desde ahora, máximo 7 días desde ahora
@@ -241,10 +271,12 @@ function App() {
         return;
       }
       if (String(form.cuit3).length !== 11) {
-      abrirModalExito("El CUIT de la Empresa Aplicadora debe tener exactamente 11 dígitos.");
+        abrirModalExito("El CUIT de la Empresa Aplicadora debe tener exactamente 11 dígitos.");
         return;
       }
-      if (String(form.cuit4).length !== 11) {
+
+      //si la categoria es aerea o dron, validar que el cuit4 tenga 11 digitos
+      if (form.categoriaAplicadora !== "AplicadoraTerrestre" && String(form.cuit4).length !== 11) {
         abrirModalExito("El CUIT del Piloto debe tener exactamente 11 dígitos.");
         return;
       }
@@ -598,11 +630,11 @@ function App() {
 
                 <div className="form-group">
                   <label>Latitud:</label>
-                  <input type="number" step="0.0001" min={-90} max={90} name="latitud" value={form.latitud} onChange={handleLatitud} required />
+                  <input type="text" name="latitud" value={form.latitud} onChange={handleLatitud} placeholder="-26.830947" required />
                 </div>
                 <div className="form-group">
                   <label>Longitud:</label>
-                  <input type="number" step="0.0001" min={-180} max={180} name="longitud" value={form.longitud} onChange={handleLongitud} required />
+                  <input type="text" name="longitud" value={form.longitud} onChange={handleLongitud} placeholder="-58.517253" required />
                 </div>
 
                 <div className="form-group">
