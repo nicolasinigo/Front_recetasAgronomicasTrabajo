@@ -286,8 +286,8 @@ function App() {
       dataToSend.cultivo = cultivoEnviar;
 
       // 3. Enviar los datos al backend
-      //`${import.meta.env.VITE_URL_BACKEND}generar-pdf`,
       const res = await axios.post(
+        //`${import.meta.env.VITE_URL_BACKEND}generar-pdf`,
         `/generar-pdf`,
         dataToSend
       );
