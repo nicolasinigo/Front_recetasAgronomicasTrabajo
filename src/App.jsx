@@ -420,21 +420,6 @@ function App() {
 
   return (
     <>
-      {!captchaValidado ? (
-        <div className="captcha-section" style={{ padding: "20px", border: "2px dashed #ccc", marginBottom: "20px" }}>
-          <p>Por favor, complete la verificación para habilitar el envío del formulario:</p>
-          <Turnstile
-            siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
-            onSuccess={(token) => {
-              setCaptchaToken(token);
-              setCaptchaValidado(true);
-            }}
-          />
-        </div>
-      ) : (
-        <p style={{ color: "green" }}>✅ Verificación completada.</p>
-      )}
-
       <div className="form-container">
 
         <div>
@@ -847,8 +832,19 @@ function App() {
 
           </div>
 
+          <div style={{ margin: "20px 0" }}>
+            <Turnstile
+              siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+              appearance="interaction-only"
+              onSuccess={(token) => {
+                setCaptchaToken(token);
+                setCaptchaValidado(true);
+              }}
+            />
+          </div>
+
           <button type="submit" disabled={!captchaValidado}>
-            {captchaValidado ? "Generar Receta" : "Complete el captcha para habilitar"}
+            {captchaValidado ? "Generar Receta" : "Complete el captcha para habilitar el envío"}
           </button>
         </form>
 
