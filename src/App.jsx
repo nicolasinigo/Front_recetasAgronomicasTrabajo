@@ -417,15 +417,12 @@ function App() {
   };
 
 
-  if (!captchaValidado) {
-    return (
-      <div className="captcha-page">
-        <div className="captcha-box">
-          <h1>Receta Agroquímica</h1>
-          <p>
-            Para acceder al formulario debe verificar que no es un robot.
-          </p>
 
+  return (
+    <>
+      {!captchaValidado ? (
+        <div className="captcha-section" style={{ padding: "20px", border: "2px dashed #ccc", marginBottom: "20px" }}>
+          <p>Por favor, complete la verificación para habilitar el envío del formulario:</p>
           <Turnstile
             siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
             onSuccess={(token) => {
@@ -434,13 +431,10 @@ function App() {
             }}
           />
         </div>
-      </div>
-    );
-  }
+      ) : (
+        <p style={{ color: "green" }}>✅ Verificación completada.</p>
+      )}
 
-
-  return (
-    <>
       <div className="form-container">
 
         <div>
@@ -853,8 +847,8 @@ function App() {
 
           </div>
 
-          <button type="submit">
-            Generar Receta
+          <button type="submit" disabled={!captchaValidado}>
+            {captchaValidado ? "Generar Receta" : "Complete el captcha para habilitar"}
           </button>
         </form>
 
