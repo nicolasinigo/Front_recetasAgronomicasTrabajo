@@ -47,9 +47,7 @@ function App() {
     cultivoOtro: "",
     diagnostico: "",
     recomendacion: "",
-    emailEmpresa: "",
     emailAsesor: "",
-    emailPiloto: "",
     agroquimicos: [
       {
         principioActivo: "",
@@ -117,7 +115,6 @@ function App() {
         [e.target.name]: e.target.value,
         piloto: "",
         cuit4: "",
-        emailPiloto: "" // Limpiamos el email del piloto también
       });
       return;
     }
@@ -217,19 +214,10 @@ function App() {
     // 3. Validar que los correos electrónicos sean válidos
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // 4. Validar correos electrónicos según la categoría de aplicadora
-    if (!emailRegex.test(form.emailEmpresa)) {
-      abrirModalExito("Por favor, ingrese un correo electrónico válido para la empresa.");
-      return;
-    }
+    // 4. Validar el correo electrónico del asesor
 
     if (!emailRegex.test(form.emailAsesor)) {
       abrirModalExito("Por favor, ingrese un correo electrónico válido para el asesor.");
-      return;
-    }
-
-    if (form.categoriaAplicadora !== "AplicadoraTerrestre" && !emailRegex.test(form.emailPiloto)) {
-      abrirModalExito("Por favor, ingrese un correo electrónico válido para el piloto.");
       return;
     }
 
@@ -257,7 +245,6 @@ function App() {
         pilotoApellido: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.pilotoApellido,
         pilotoNombres: form.categoriaAplicadora === "AplicadoraTerrestre" ? "--------" : form.pilotoNombres,
         cuit4: form.categoriaAplicadora === "AplicadoraTerrestre" ? "-----------" : form.cuit4,
-        emailPiloto: form.categoriaAplicadora === "AplicadoraTerrestre" ? "" : form.emailPiloto,
         captchaToken: captchaToken // Enviamos el token del captcha al backend
       };
 
@@ -327,9 +314,7 @@ function App() {
         cultivoOtro: "",
         diagnostico: "",
         recomendacion: "",
-        emailEmpresa: "",
         emailAsesor: "",
-        emailPiloto: "",
         agroquimicos: [
           {
             principioActivo: "",
@@ -803,30 +788,12 @@ function App() {
             </div>
 
             <div className="form-group full" style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "8px" }}>
-              {/* mail por el cual se enviara la receta */}
-              <div className="form-group full">
-                <legend>En este correo electrónico usted recibirá la receta</legend>
-                <label>Correo Electrónico Empresa:</label>
-                <input type="email" name="emailEmpresa" value={form.emailEmpresa} onChange={handleChange} required maxLength="40" />
-              </div>
               <br />
               <div className="form-group full">
-                <legend>En este correo electrónico el asesor recibirá una copia de la receta</legend>
+                <legend>En este correo electrónico el asesor recibirá la receta</legend>
                 <label>Correo Electrónico del Asesor:</label>
                 <input type="email" name="emailAsesor" value={form.emailAsesor} onChange={handleChange} required maxLength="40" />
               </div>
-              <br />
-
-              {(form.categoriaAplicadora === "AplicadoraAerea" ||
-                form.categoriaAplicadora === "AplicadoraDron") && (
-                  <>
-                    <div className="form-group full">
-                      <legend>En este correo electrónico el piloto recibirá una copia de la receta.</legend>
-                      <label>Correo Electrónico del Piloto:</label>
-                      <input type="email" name="emailPiloto" value={form.emailPiloto} onChange={handleChange} required maxLength="40" />
-                    </div>
-                  </>
-                )}
 
             </div>
 
