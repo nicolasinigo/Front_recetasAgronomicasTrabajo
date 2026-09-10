@@ -7,7 +7,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<FormularioRecetas />} />
-      <Route path="/ConfirmarReceta/:id" element={<ConfirmarRecetas />} />
+      <Route path="/Receta/:id" element={<ConfirmarRecetas />} />
     </Routes>
   )
 }
